@@ -1,0 +1,20 @@
+{
+  "name": "file_organizer",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "File_Organizer.js",
+  "scripts": {
+    "start": "node File_Organizer.js"
+  },
+  "dependencies": {
+    "@tailwindcss/cli": "^4.1.14",
+    "express": "^5.1.0",
+    "logger": "^0.0.1",
+    "node": "^24.9.0",
+    "pino": "^10.0.0",
+    "tailwindcss": "^4.1.14"
+  },
+  "devDependencies": {
+    "pino-pretty": "^13.1.1"
+  }
+}

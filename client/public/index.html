@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartFolder - Fullscreen Organizer</title>
+    <!-- Apple-esque fonts: San Francisco is proprietary, so Inter is the closest open-source alternative.
+         Roboto Mono for code/file paths. -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F5F7FA; /* A very light, cool gray */
+        }
+        .font-mono-code {
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        /* Custom shadows for a sense of depth and lift, like macOS */
+        .shadow-apple-sm {
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+        }
+        .shadow-apple-md {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+        }
+        .shadow-apple-lg {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .shadow-apple-xl {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        /* Frosted Glass / Vibrancy Effect (Apple's 'Material' concept) */
+        .glass-background {
+            background-color: rgba(255, 255, 255, 0.8); /* Slightly transparent white */
+            backdrop-filter: blur(15px) saturate(1.8); /* Stronger blur and saturation */
+            -webkit-backdrop-filter: blur(15px) saturate(1.8);
+        }
+        .glass-card {
+            background-color: rgba(255, 255, 255, 0.7); /* Slightly more transparent for nested cards */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        /* Transition for hover/focus states */
+        .transition-ease {
+            transition: all 0.2s ease-in-out;
+        }
+
+        /* Full screen adjustments */
+        #app-container {
+            width: calc(100vw - 4rem); /* Full viewport width minus padding */
+            height: calc(100vh - 4rem); /* Full viewport height minus padding */
+        }
+
+        /* --- NEW STYLES FOR TEXT OVERFLOW --- */
+        .file-list-item {
+            /* Ensures text wraps if it has natural break points (spaces, hyphens) */
+            word-wrap: break-word;
+            /* For long strings without natural break points, this will break anywhere */
+            overflow-wrap: break-word;
+            /* Also explicitly prevents content from overflowing the parent container horizontally */
+            overflow-x: auto; /* Adds horizontal scrollbar if needed */
+            white-space: normal; /* Ensures wrapping, overrides any potential 'nowrap' */
+        }
+        .file-list-content {
+            /* Ensure the container itself can handle horizontal overflow if a single line is too long */
+            overflow-x: auto;
+            /* Hide vertical scrollbar for aesthetics if not needed by default, but allow if content height overflows */
+            overflow-y: auto;
+        }
+
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-8 text-gray-800 antialiased">
+
+    <div id="app-container" class="glass-background rounded-3xl shadow-apple-xl p-12 w-full h-full border border-gray-100 transition-ease flex flex-col justify-between">
+        <!-- Header Section -->
+        <div>
+            <h1 class="text-6xl font-bold text-center text-gray-900 mb-12 tracking-tight leading-tight">
+                <span class="text-blue-600">SmartFolder</span> Organizer
+            </h1>
+
+            <!-- Folder Input Section -->
+            <div class="mb-14 bg-gray-50/50 glass-card rounded-2xl shadow-apple-md border border-gray-100 p-7 transition-ease hover:shadow-apple-lg">
+                <label for="folderPath" class="block text-xl font-medium text-gray-700 mb-4">Choose Folder to Sort</label>
+                <div class="flex flex-col md:flex-row items-stretch md:items-center space-y-5 md:space-y-0 md:space-x-5">
+                    <input type="text" id="folderPath" placeholder="e.g., /Users/YourName/Downloads/Unsorted Files"
+                           class="flex-grow p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-blue-200 focus:border-blue-400 text-gray-800 text-lg shadow-apple-sm
+                                  transition-ease hover:border-gray-400 font-mono-code placeholder-gray-400" />
+                    <button id="arrangeButton"
+                            class="px-9 py-4 bg-blue-600 text-white font-semibold text-xl rounded-xl shadow-apple-md
+                                   hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300
+                                   transition-ease transform hover:-translate-y-0.5 hover:shadow-apple-lg active:scale-98">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Arrange
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Before & After Arrangement Display -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-14 flex-grow ">
+            <!-- Before Arrangement Panel -->
+            <div class="glass-card p-9  rounded-2xl h-auto shadow-apple-md border border-gray-200 transition-ease hover:shadow-apple-lg transform hover:-translate-y-0.5 flex flex-col">
+                <h2 class="text-3xl font-semibold text-gray-800 mb-6 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-9 w-9 mr-3 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Original State
+                </h2>
+                <div class="flex items-center justify-between text-2xl font-medium text-gray-700 mb-7 pb-3 border-b border-gray-100">
+                    <span>Total Items:</span>
+                    <span id="beforeItemsCount" class="text-red-600 font-bold text-4xl">0</span>
+                </div>
+                <div id="beforeFolderContent" class="file-list-content  h-full bg-gray-50/40 border border-gray-200 rounded-lg p-4 text-base text-gray-800 font-mono-code leading-relaxed">
+                    <p class="text-gray-400  italic">No folder selected or content loaded yet.</p>
+                </div>
+            </div>
+
+            <!-- After Arrangement Panel -->
+            <div class="glass-card p-9 rounded-2xl shadow-apple-md border border-gray-200 transition-ease hover:shadow-apple-lg transform hover:-translate-y-0.5 flex flex-col">
+                <h2 class="text-3xl font-semibold text-gray-800 mb-6 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-9 w-9 mr-3 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Organized Structure
+                </h2>
+                <div class="flex items-center justify-between text-2xl font-medium text-gray-700 mb-7 pb-3 border-b border-gray-100">
+                    <span>Items Left:</span>
+                    <span id="afterItemsCount" class="text-green-600 font-bold text-4xl">0</span>
+                </div>
+                <div id="afterFolderContent" class="file-list-content h-full bg-gray-50/40 border border-gray-200 rounded-lg p-4 text-base text-gray-800 font-mono-code leading-relaxed">
+                     <p class="text-gray-400 italic">Arrange a folder to see results here.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Section -->
+        <div class="glass-card p-9 rounded-2xl shadow-apple-md border border-gray-100 text-center transition-ease hover:shadow-apple-lg">
+            <h2 class="text-3xl font-bold text-gray-800 mb-7">Arrangement Summary</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-2xl">
+                <div class="glass-card p-6 rounded-xl shadow-apple-sm border border-gray-100 transition-ease hover:shadow-apple-md">
+                    <p class="text-gray-600 mb-3">Total Before:</p>
+                    <span id="statBeforeItems" class="font-bold text-blue-600 text-5xl">0</span>
+                </div>
+                <div class="glass-card p-6 rounded-xl shadow-apple-sm border border-gray-100 transition-ease hover:shadow-apple-md">
+                    <p class="text-gray-600 mb-3">Total After:</p>
+                    <span id="statAfterItems" class="font-bold text-blue-600 text-5xl">0</span>
+                </div>
+                <div class="glass-card p-6 rounded-xl shadow-apple-sm border border-gray-100 transition-ease hover:shadow-apple-md">
+                    <p class="text-gray-600 mb-3">Items Organized:</p>
+                    <span id="statOrganizedItems" class="font-bold text-blue-600 text-5xl">0</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+  <script type="module" src="/js/app.js"></script>
+    <script type="module" src="/js/runner.js"></script>
+  <!-- <script type="module" src="/js.js"></script> -->
+</body>
+</html>
