@@ -1,14 +1,15 @@
 import path from "path";
 import fs from "fs/promises";
 import { existsSync } from "node:fs";
-import e from "express";
+
 
 export class FileOrganizer {
   constructor(dirPath) {
-    this.dirPath = dirPath;
-    this.OrginalStateFolder = [];
+    this.baseDir = "/Users/user"
+   this.dirPath = path.join(this.baseDir, dirPath);
+    this.OriginalStateFolder = [];
     this.OrganizedStateFolder = []
-    this.baseDir = "/Users/user/"
+    
   }
 
   // return an Annay OrganizedFolder List
@@ -17,7 +18,7 @@ export class FileOrganizer {
   }
   //Return an array of OriginalState of the Folder
    getOrginalStateFolder() {
-    return this.OrginalStateFolder
+    return this.OriginalStateFolder
   }
 
   // Read all files in a folder
@@ -33,35 +34,10 @@ export class FileOrganizer {
       }
 
       const Orginalitems = await fs.readdir(this.dirPath);
-      this.OrginalStateFolder.push({data : Orginalitems, length : Orginalitems.length})
-  
-      for (let i = 0; i < Orginalitems.length; i++) {
-        const itemPath = path.join(this.dirPath, Orginalitems[i]);
-        const stats = await fs.stat(itemPath);
-
-        if (stats.isFile()) {
-          // Get extension
-          const extname = path.extname(Orginalitems[i]).slice(1);
-          if (!extname) continue; // skip files with no extension
-
-          const filename = path.basename(Orginalitems[i]);
-          const folderToCreate = path.join(this.dirPath, extname);
-
-          // Create folder if it doesn’t exist
-          if (!this.#checkFolderExist(extname)) {
-            // console.log(`📂 Creating folder: ${folderToCreate}`);
-            await fs.mkdir(folderToCreate, { recursive: true });
-          }
-
-          // Move file into folder
-          const src = itemPath;
-          const dest = path.join(folderToCreate, filename);
-          await this.#moveFile(src, dest);
-        } else {
-          // If it's already a directory, skip it
-          console.log(`ℹ️ Skipping directory: ${Orginalitems[i]}`);
-        }
-      }
+      this.OriginalStateFolder.push({data : Orginalitems, length : Orginalitems.length})
+        
+      
+        await this.#processFiles(Orginalitems)
     } catch (error) {
       console.error("❌ Something went wrong:", error.message);
     }
@@ -78,8 +54,8 @@ export class FileOrganizer {
     const response = {
       folder:  {
          OrginalStateFolder :{
-         data : this.OrginalStateFolder[0].data,
-         length : this.OrginalStateFolder[0].length,
+         data : this.OriginalStateFolder[0].data,
+         length : this.OriginalStateFolder[0].length,
       },
 
       OrganizedStateFolder : {
@@ -115,6 +91,38 @@ export class FileOrganizer {
              items : items,
              count : items.length
           }
+  }
+
+
+  async #processFiles(files){
+    for (let i = 0; i < files.length; i++) {
+        const itemPath = path.join(this.dirPath, files[i]);
+        const stats = await fs.stat(itemPath);
+
+        if (stats.isFile()) {
+          // Get extension
+          const extname = path.extname(files[i]).slice(1);
+          if (!extname) continue; // skip files with no extension
+
+          const filename = path.basename(files[i]);
+          const folderToCreate = path.join(this.dirPath, extname);
+
+          // Create folder if it doesn’t exist
+          if (!this.#checkFolderExist(extname)) {
+            // console.log(`📂 Creating folder: ${folderToCreate}`);
+            await fs.mkdir(folderToCreate, { recursive: true });
+          }
+
+          // Move file into folder
+          const src = itemPath;
+          const dest = path.join(folderToCreate, filename);
+          await this.#moveFile(src, dest);
+        } else {
+          // If it's already a directory, skip it
+          console.log(`ℹ️ Skipping directory: ${files[i]}`);
+        }
+      }
+
   }
 
   
