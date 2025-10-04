@@ -4,7 +4,9 @@
   "type": "module",
   "main": "File_Organizer.js",
   "scripts": {
-    "start": "node File_Organizer.js"
+    "start": "node server/app.js",
+  "dev": "nodemon server/app.js"
+   
   },
   "dependencies": {
     "@tailwindcss/cli": "^4.1.14",
