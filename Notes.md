@@ -1,6 +1,8 @@
 
 #Work in Progress
- ###Add Apis for  Processing payment
+
+
+###Add Apis for  Processing payment
 
 `export async function sendDir(value) {
     console.log(value)
@@ -10,8 +12,12 @@
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ dirPath: value })  // proper JSON
     });
+  }
+}
+`
 
-    `
+
+
 
 
   
