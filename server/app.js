@@ -1,7 +1,7 @@
 import express from "express";
 import path from "path";
 import fs from "fs/promises";
-import { FileOrganizer } from "./FileOrganzer.js"
+import { FileOrganizer } from "./FileOrganzer.js"; // fixed typo
 import logger from "pino";
 
 const log = logger({
@@ -16,17 +16,23 @@ const log = logger({
 const app = express();
 const PORT = 3000;
 
+// Correct relative paths from server/app.js
+const publicPath = path.resolve("./../public"); // or "./../public" depending on Render root
+const jsPath = path.resolve("./../js");
 
 
 
 
 
 // Serve frontend HTML/CSS
-const publicPath = path.resolve("../public");
-app.use("/app", express.static(publicPath));  // HTML & CSS served at /app
-app.use("/", express.static(publicPath)); 
+
+// app.use("/app", express.static(publicPath));  // HTML & CSS served at /app
+// app.use("/", express.static(publicPath)); 
+app.get("/", (req, res) => {
+  res.sendFile(path.join(publicPath, "index.html"));
+});
 // Serve frontend JS
-const jsPath = path.resolve("../js");
+
 app.use("/js", express.static(jsPath));       // JS served at /js
 
 // Middleware to parse JSON bodies
