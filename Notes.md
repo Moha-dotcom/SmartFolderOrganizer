@@ -16,6 +16,10 @@
 }
 `
 
+##Known Issue
+
+- The order API is not sending the payment method detail to the payment api
+
 
 
 
