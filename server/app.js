@@ -1,7 +1,7 @@
 import express from "express";
 import path from "path";
 import fs from "fs/promises";
-import  {FileOrganizer}  from "./FileOrganzer.js"
+import { FileOrganizer } from "./FileOrganizer.js";
 import logger from "pino";
 
 const log = logger({
