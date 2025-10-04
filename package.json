@@ -4,8 +4,8 @@
   "type": "module",
   "main": "File_Organizer.js",
   "scripts": {
-    "start": "node server/app.js",
-  "dev": "nodemon server/app.js"
+   "dev": "nodemon server/app.js",
+  "start": "node server/app.js"
    
   },
   "dependencies": {
