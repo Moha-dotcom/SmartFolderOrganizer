@@ -119,14 +119,3 @@ export class FileOrganizer {
 
   
 }
-
-// // Example usage
-// const organizer = new FileOrganizer("/Users/user/documents");
-
-// organizer.organizerFolder();
-//       // console.log(path.resolve("Desktop", "..", "..", "."))
-
-// // console.log(await organizer.getDirectoryFiles())
-
-// // import fs from "fs/promises";
-// // import path from "path";
