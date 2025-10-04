@@ -26,11 +26,8 @@ const jsPath = path.resolve("./../js");
 
 // Serve frontend HTML/CSS
 
-// app.use("/app", express.static(publicPath));  // HTML & CSS served at /app
-// app.use("/", express.static(publicPath)); 
-app.get("/", (req, res) => {
-  res.sendFile(path.join(publicPath, "./../public/index.html"));
-});
+app.use("/app", express.static(publicPath));  // HTML & CSS served at /app
+app.use("/", express.static(publicPath)); 
 // Serve frontend JS
 
 app.use("/js", express.static(jsPath));       // JS served at /js
