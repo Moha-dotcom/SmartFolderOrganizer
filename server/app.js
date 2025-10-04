@@ -1,69 +1,4 @@
-// import express from "express";
-// import path from "path";
-// import fs from "fs/promises";
-// import { FileOrganizer } from "./FileOrganzer.js"; // fixed typo
-// import logger from "pino";
 
-// const log = logger({
-//   level: "info",              // "info", "debug", "error", etc.
-//   transport: {
-//     target: "pino-pretty",    // only for dev; pretty-print logs
-//     options: {
-//       colorize: true
-//     }
-//   }
-// });
-// const app = express();
-// const PORT = 3000;
-
-// // Correct relative paths from server/app.js
-// const publicPath = path.resolve(__dirname, "../client/public");
-// const jsPath = path.resolve(__dirname, "../client/js");
-
-
-
-// // Serve frontend HTML/CSS
-
-// app.use("/app", express.static(publicPath));  // HTML & CSS served at /app
-// app.use("/", express.static(publicPath)); 
-// // Serve frontend JS
-
-// app.use("/js", express.static(jsPath));       // JS served at /js
-
-// // Middleware to parse JSON bodies
-// app.use(express.json());
-
-// // API router
-// const apiRouter = express.Router();
-
-// // API route to organize files
-// apiRouter.post("/organize", async (req, res) => {
-//   try {
-//     const { dirPath } = req.body;
-//     console.log(dirPath)
-//     if (!dirPath){
-//        log.warn("No dirPath provided");
-//        return res.status(400).json({ error: "dirPath is required" });
-//     } 
-//     const test = new FileOrganizer(dirPath);
-//     const result = await test.organizerFolder()
-
-//    log.info({ dirPath }, "Organized folder successfully");
-//     res.json(result);
-
-//   } catch (err) {
-//     log.error({ err }, "Error organizing folder");
-//     res.status(500).json({ error: err.message });
-//   }
-// });
-
-// // Mount API router at /api
-// app.use("/api", apiRouter);
-
-// // Start server
-// app.listen(PORT, () => {
-//   log.info(`🚀 Server running at http://localhost:${PORT}/app`);
-// });
 
 
 import express from "express";
@@ -108,21 +43,21 @@ const apiRouter = express.Router();
 
 // Organize files endpoint
 apiRouter.post("/organize", async (req, res) => {
+  const { folderName } = req.body;
+
+  if (!folderName) {
+    return res.status(400).json({ error: "folderName is required" });
+  }
+
   try {
-    const { dirPath } = req.body;
+    const organizer = new FileOrganizer(folderName);
+    const result = await organizer.organizeFolder();  // ✅ Correct method name
 
-    if (!dirPath) {
-      log.warn("No dirPath provided");
-      return res.status(400).json({ error: "dirPath is required" });
-    }
+    if (result.error) return res.status(400).json(result);
 
-    const organizer = new FileOrganizer(dirPath);
-    const result = await organizer.organizerFolder();
-
-    log.info({ dirPath }, "Organized folder successfully");
     res.json(result);
   } catch (err) {
-    log.error({ err }, "Error organizing folder");
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
