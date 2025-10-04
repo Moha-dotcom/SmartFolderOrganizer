@@ -24,7 +24,7 @@ const PORT = 3000;
 // Serve frontend HTML/CSS
 const publicPath = path.resolve("../client/public");
 app.use("/app", express.static(publicPath));  // HTML & CSS served at /app
-
+app.use("/", express.static(publicPath)); 
 // Serve frontend JS
 const jsPath = path.resolve("../client/js");
 app.use("/js", express.static(jsPath));       // JS served at /js
