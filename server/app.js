@@ -1,6 +1,3 @@
-
-
-
 import express from "express";
 import path from "path";
 import fs from "fs/promises";
@@ -43,21 +40,28 @@ const apiRouter = express.Router();
 
 // Organize files endpoint
 apiRouter.post("/organize", async (req, res) => {
-  const { folderName } = req.body;
-
-  if (!folderName) {
-    return res.status(400).json({ error: "folderName is required" });
-  }
-
   try {
-    const organizer = new FileOrganizer(folderName);
-    const result = await organizer.organizeFolder();  // ✅ Correct method name
+    const { dirPath } = req.body;
 
-    if (result.error) return res.status(400).json(result);
 
+    if (!dirPath) {
+      log.warn("No dirPath provided");
+      return res.status(400).json({ error: "dirPath is required" });
+    }
+
+    if(dirPath === "") log.error("dirPath is empty")
+      log.info(dirPath)
+     const organizer = new FileOrganizer(dirPath);
+   
+
+    
+    
+    const result = await organizer.organizeFolder();
+    log.info(result)
+    log.info({ dirPath }, "Organized folder successfully");
     res.json(result);
   } catch (err) {
-    console.error(err);
+    log.error({ err }, "Error organizing folder");
     res.status(500).json({ error: err.message });
   }
 });
