@@ -68,6 +68,8 @@ describe("FileOrganizer", () => {
 
     const result = await organizer.organizeFolder();
 
+    // Fixed FIle input issues : issue-123-fixed
+
     // Verify fs interactions
     expect(fs.mkdir).toHaveBeenCalledWith(fullDirPath, { recursive: true });
     expect(fs.readdir).toHaveBeenCalledTimes(2);
